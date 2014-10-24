@@ -19,19 +19,23 @@
 namespace caffe {
 
 template <typename Dtype>
-Net<Dtype>::Net(const NetParameter& param) {
-  Init(param);
+Net<Dtype>::Net(const NetParameter& param,
+                const size_t force_input_count) {
+  Init(param, force_input_count);
 }
 
 template <typename Dtype>
-Net<Dtype>::Net(const string& param_file) {
+Net<Dtype>::Net(const string& param_file,
+                const size_t force_input_count) {
   NetParameter param;
   ReadNetParamsFromTextFileOrDie(param_file, &param);
-  Init(param);
+  Init(param, force_input_count);
 }
 
 template <typename Dtype>
-void Net<Dtype>::Init(const NetParameter& in_param) {
+void Net<Dtype>::Init(const NetParameter& in_param,
+                      const size_t force_input_count) {
+  force_input_count_ = force_input_count;
   // Filter layers based on their include/exclude rules and
   // the current NetState.
   NetParameter filtered_param;
@@ -366,7 +370,7 @@ void Net<Dtype>::AppendTop(const NetParameter& param, const int layer_id,
     if (blob_name_to_idx) { (*blob_name_to_idx)[blob_name] = blob_id; }
     if (layer_id == -1) {
       // Set the (explicitly specified) dimensions of the input blob.
-      blob_pointer->Reshape(param.input_dim(top_id * 4),
+      blob_pointer->Reshape((force_input_count_ > 0) ? force_input_count_ : param.input_dim(top_id * 4),
                             param.input_dim(top_id * 4 + 1),
                             param.input_dim(top_id * 4 + 2),
                             param.input_dim(top_id * 4 + 3));
