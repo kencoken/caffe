@@ -11,12 +11,10 @@ average_image = sprintf('%s/VGG_mean.mat', model_dir);
 encoder = featpipem.directencode.ConvNetEncoder(param_file, model_file, ...
                                                 average_image, ...
                                                 'output_blob_names', {'fc7','fc8'});
-                                            
+
 encoder.augmentation = 'aspect_corners';
 encoder.augmentation_collate = 'sum';
 
 encoder.set_backend('gpu', 0);
 
-
 end
-
